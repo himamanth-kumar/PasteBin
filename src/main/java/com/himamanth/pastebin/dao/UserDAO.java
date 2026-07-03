@@ -17,7 +17,7 @@ public class UserDAO
     {
 
         String sql = """
-                INSERT INTO users(username, email, password)
+                INSERT INTO users(username, email, password_hash)
                 VALUES (?, ?, ?)
                 """;
 
@@ -116,5 +116,49 @@ public class UserDAO
             return false;
 
         }
+    }
+    public User login(String email, String password) throws Exception {
+
+        String sql = """
+                SELECT *
+                FROM users
+                WHERE email = ?
+                """;
+
+        try (
+                Connection con = DBConnection.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+
+                    String storedHash = rs.getString("password_hash");
+
+                    if (BCrypt.checkpw(password, storedHash)) 
+                    {
+
+                        User user = new User();
+
+                        user.setUserId(rs.getInt("user_id"));
+                        user.setUsername(rs.getString("username"));
+                        user.setEmail(rs.getString("email"));
+                        user.setPasswordHash(storedHash);
+                        user.setCreatedAt(rs.getTimestamp("created_at"));
+
+                        return user;
+                    }
+                }
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

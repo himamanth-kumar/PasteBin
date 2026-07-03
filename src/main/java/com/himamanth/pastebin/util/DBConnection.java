@@ -17,7 +17,7 @@ public class DBConnection
 		String url = properties.getProperty("db.url");
 		String username = properties.getProperty("db.username");
 		String password = properties.getProperty("db.password");
-		
+		Class.forName("org.postgresql.Driver");
 		return DriverManager.getConnection(url, username, password);
 	}
 	public static void main(String[] args) throws Exception {
