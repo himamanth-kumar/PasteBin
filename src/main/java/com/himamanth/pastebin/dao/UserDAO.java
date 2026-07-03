@@ -17,7 +17,7 @@ public class UserDAO
     {
 
         String sql = """
-                INSERT INTO users(username, email, password_hash)
+                INSERT INTO users(username, email, password)
                 VALUES (?, ?, ?)
                 """;
 
