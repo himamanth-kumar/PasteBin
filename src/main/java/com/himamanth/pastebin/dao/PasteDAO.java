@@ -229,4 +229,58 @@ public class PasteDAO
             return false;
         }
     }
+    public List<Paste> getUserPastes(int userId) throws Exception {
+
+        List<Paste> pastes = new ArrayList<>();
+
+        String sql = """
+                SELECT *
+                FROM pastes
+                WHERE user_id = ?
+                ORDER BY created_at DESC
+                """;
+
+        try (Connection con = DBConnection.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql) ) {
+
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+
+                while (rs.next()) 
+                {
+
+                    Paste paste = new Paste();
+
+                    paste.setPasteId(rs.getInt("paste_id"));
+                    paste.setTitle(rs.getString("title"));
+                    paste.setContent(rs.getString("content"));
+                    paste.setVisibility(rs.getString("visibility"));
+                    paste.setCreatedAt(rs.getTimestamp("created_at"));
+                    paste.setUpdatedAt(rs.getTimestamp("updated_at"));
+
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    paste.setUser(user);
+
+                    Category category = new Category();
+                    category.setCategoryId(rs.getInt("category_id"));
+                    paste.setCategory(category);
+
+                    pastes.add(paste);
+                }
+
+            }
+
+        } 
+        catch (SQLException e) 
+        {
+
+            e.printStackTrace();
+
+        }
+
+        return pastes;
+    }
 }
