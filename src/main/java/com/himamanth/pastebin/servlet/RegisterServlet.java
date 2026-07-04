@@ -1,16 +1,15 @@
-//PRG Pattern
 package com.himamanth.pastebin.servlet;
 
 import java.io.IOException;
+
+import com.himamanth.pastebin.dao.UserDAO;
+import com.himamanth.pastebin.model.User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import com.himamanth.pastebin.dao.UserDAO;
-import com.himamanth.pastebin.model.User;
 
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
@@ -26,93 +25,56 @@ public class RegisterServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        // Check username
         try {
-			if(userDAO.usernameExists(username)) 
-			{
 
-			    request.setAttribute(
-			            "error",
-			            "Username already exists."
-			    );
+            // Check username
+            if (userDAO.usernameExists(username)) {
 
-			    request.getRequestDispatcher("register.jsp")
-			            .forward(request, response);
+                request.setAttribute("error", "Username already exists.");
+                request.getRequestDispatcher("register.jsp")
+                       .forward(request, response);
+                return;
+            }
 
-			    return;
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            // Check email
+            if (userDAO.emailExists(email)) {
 
-        // Check email
-        try {
-			if(userDAO.emailExists(email)) 
-			{
+                request.setAttribute("error", "Email already registered.");
+                request.getRequestDispatcher("register.jsp")
+                       .forward(request, response);
+                return;
+            }
 
-			    request.setAttribute(
-			            "error",
-			            "Email already registered."
-			    );
+            // Register user
+            User user = new User(username, email, password);
 
-			    request.getRequestDispatcher("register.jsp")
-			            .forward(request, response);
+            boolean registered = userDAO.registerUser(user);
 
-			    return;
-			}
-		} 
-        catch (ServletException e) 
-        {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-        catch (IOException e) 
-        {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-        catch (Exception e) 
-        {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            if (registered) {
 
-        User user = new User(
-                username,
-                email,
-                password
-        );
+                // PRG Pattern
+                response.sendRedirect("login.jsp");
 
-        boolean registered = false;
-		try 
-		{
-			registered = userDAO.registerUser(user);
-			} 
-		catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            } else {
 
-        if(registered)
-        {
+                request.setAttribute("error", "Registration failed.");
+                request.getRequestDispatcher("register.jsp")
+                       .forward(request, response);
+            }
 
-            response.sendRedirect("login.jsp");
+        } catch (Exception e) {
 
-        } 
-        else 
-	        {
-	
-	            request.setAttribute(
-	                    "error",
-	                    "Registration failed."
-	            );
-	
-	            request.getRequestDispatcher("register.jsp")
-	                    .forward(request, response);
-	
-	        }
+            
+            e.printStackTrace();
 
+            
+            request.setAttribute(
+                    "error",
+                    "Something went wrong. Please try again later."
+            );
+
+            request.getRequestDispatcher("register.jsp")
+                   .forward(request, response);
+        }
     }
-
 }

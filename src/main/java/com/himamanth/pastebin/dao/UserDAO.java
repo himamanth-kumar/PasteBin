@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import com.himamanth.pastebin.model.Paste;
 import com.himamanth.pastebin.model.User;
 import com.himamanth.pastebin.util.DBConnection;
 
@@ -35,11 +36,12 @@ public class UserDAO
             ps.setString(2, user.getEmail());
             ps.setString(3, hashedPassword);
 
-            int rows = ps.executeUpdate();
+            int rowsAffected = ps.executeUpdate();
 
-            return rows > 0;
+            return rowsAffected > 0;
 
-        } catch (SQLException e) 
+        } 
+        catch (SQLException e) 
         {
             e.printStackTrace();
             return false;
@@ -117,7 +119,8 @@ public class UserDAO
 
         }
     }
-    public User login(String email, String password) throws Exception {
+    public User login(String email, String password) throws Exception 
+    {
 
         String sql = """
                 SELECT *
@@ -126,9 +129,9 @@ public class UserDAO
                 """;
 
         try (
-                Connection con = DBConnection.getConnection();
-                PreparedStatement ps = con.prepareStatement(sql)
-        ) {
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql)
+        		) {
 
             ps.setString(1, email);
 
@@ -155,10 +158,38 @@ public class UserDAO
 
             }
 
-        } catch (SQLException e) {
+        } 
+        catch (SQLException e) 
+        {
             e.printStackTrace();
         }
 
         return null;
+    }
+    public boolean createPaste(Paste paste) throws Exception
+    {
+    	String sql = """
+    			INSERT INTO pastes(title,content,visibility,user_id,category_id)
+                VALUES (?, ?, ?, ?, ?)
+    			""";
+    	try(Connection con = DBConnection.getConnection();
+    			PreparedStatement ps = con.prepareStatement(sql))
+    	{
+    		ps.setString(1, paste.getTitle());
+            ps.setString(2, paste.getContent());
+            ps.setString(3, paste.getVisibility());
+            ps.setInt(4, paste.getUser().getUserId());
+            ps.setInt(4, paste.getCategory().getCategoryId());
+            
+
+            int rowsAffected = ps.executeUpdate();
+
+            return rowsAffected > 0;
+    	}
+    	catch (SQLException e) 
+    	{
+    		e.printStackTrace();
+    		return false;
+		}
     }
 }
