@@ -107,10 +107,9 @@ Edit
 
 |
 
-<a href="deletePaste?id=<%= paste.getPasteId() %>">
-
+<a href="deletePaste?id=<%= paste.getPasteId() %>"
+   onclick="return confirm('Delete this paste?');">
 Delete
-
 </a>
 
 </td>
