@@ -208,6 +208,7 @@ public class PasteDAO
         String sql = """
                 DELETE FROM pastes
                 WHERE paste_id = ?
+                AND user_id = ?
                 """;
 
         try (
@@ -283,4 +284,5 @@ public class PasteDAO
 
         return pastes;
     }
+    
 }

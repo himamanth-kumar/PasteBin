@@ -12,7 +12,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/register")
-public class RegisterServlet extends HttpServlet {
+public class RegisterServlet extends HttpServlet 
+{
 
     private UserDAO userDAO = new UserDAO();
 
@@ -24,8 +25,20 @@ public class RegisterServlet extends HttpServlet {
         String username = request.getParameter("username");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-
+        
         try {
+        	if (!isValidPassword(password)) 
+            {
+
+                request.setAttribute(
+                        "error",
+                        "Password must be at least 12 characters and contain uppercase, lowercase and a digit.");
+
+                request.getRequestDispatcher("register.jsp").forward(request, response);
+
+                return;
+            }
+
 
             // Check username
             if (userDAO.usernameExists(username)) {
@@ -76,5 +89,28 @@ public class RegisterServlet extends HttpServlet {
             request.getRequestDispatcher("register.jsp")
                    .forward(request, response);
         }
+    }
+    private boolean isValidPassword(String password) {
+
+        if (password == null || password.length() < 12) {
+            return false;
+        }
+
+        boolean hasUpper = false;
+        boolean hasLower = false;
+        boolean hasDigit = false;
+
+        for (char ch : password.toCharArray()) {
+
+            if (Character.isUpperCase(ch)) {
+                hasUpper = true;
+            } else if (Character.isLowerCase(ch)) {
+                hasLower = true;
+            } else if (Character.isDigit(ch)) {
+                hasDigit = true;
+            }
+        }
+
+        return hasUpper && hasLower && hasDigit;
     }
 }

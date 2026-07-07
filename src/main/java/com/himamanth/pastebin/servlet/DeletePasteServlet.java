@@ -16,7 +16,7 @@ public class DeletePasteServlet extends HttpServlet {
     private PasteDAO pasteDAO = new PasteDAO();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             						throws ServletException, IOException 
     {
 
@@ -50,7 +50,8 @@ public class DeletePasteServlet extends HttpServlet {
                 return;
             }
 
-            if (paste.getUser().getUserId() != user.getUserId()) {
+            if (paste.getUser().getUserId() != user.getUserId()) 
+            {
 
                 response.sendError(HttpServletResponse.SC_FORBIDDEN);
 

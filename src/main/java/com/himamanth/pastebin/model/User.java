@@ -62,11 +62,8 @@ public class User
 	}
 	public void setPasswordHash(String passwordHash) 
 	{
-		
-		if(passwordHash != null && passwordHash.contains("'a'-z"))
-		{
 			this.passwordHash=passwordHash;
-		}
+		
 	}
 	public Timestamp getCreatedAt() 
 	{

@@ -57,7 +57,7 @@ public class CreatePasteServlet extends HttpServlet {
             if (created) 
             {
 
-                response.sendRedirect("home.jsp");
+                response.sendRedirect("dashboard");
 
             } 
             else {

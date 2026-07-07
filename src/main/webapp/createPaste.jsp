@@ -1,63 +1,236 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ page import="com.himamanth.pastebin.model.User" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+response.setHeader("Pragma", "no-cache");
+response.setDateHeader("Expires", 0);
 
+User user = (User) session.getAttribute("user");
+if (user == null) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Create Paste</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Paste · Pastebin</title>
+<style>
+  :root {
+    --color-bg: #f5f6fa;
+    --color-surface: #ffffff;
+    --color-border: #e3e5eb;
+    --color-text: #1c1e26;
+    --color-text-muted: #6b7080;
+    --color-primary: #4f5bd5;
+    --color-primary-hover: #3f4ac0;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 2px rgba(20, 20, 43, 0.06);
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: "SF Mono", Consolas, "Courier New", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  .topbar {
+    padding: 18px 32px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .topbar a.back {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+  .topbar a.back:hover { color: var(--color-primary); }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 32px;
+  }
+
+  h1 {
+    font-size: 20px;
+    margin: 0 0 20px;
+  }
+
+  .form-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 28px;
+  }
+
+  .field {
+    margin-bottom: 20px;
+  }
+
+  .field:last-of-type {
+    margin-bottom: 0;
+  }
+
+  label {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--color-text);
+  }
+
+  input[type="text"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-family: var(--font-sans);
+    background: var(--color-surface);
+    color: var(--color-text);
+    transition: border-color 0.15s ease;
+  }
+
+  textarea {
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+    resize: vertical;
+    min-height: 220px;
+    line-height: 1.5;
+  }
+
+  input[type="text"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .field-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+
+  .char-count {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+
+  .row-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--color-primary-hover); }
+
+  .btn-secondary {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+  }
+  .btn-secondary:hover { background: var(--color-bg); }
+</style>
 </head>
 <body>
 
-<h2>Create New Paste</h2>
+<div class="topbar">
+  <a class="back" href="dashboard.jsp">&larr; Back to dashboard</a>
+</div>
 
-<form action="createPaste" method="post">
+<div class="container">
+  <h1>Create New Paste</h1>
 
-Title <br>
-<input type="text" name="title" required>
+  <div class="form-card">
+    <form action="createPaste" method="post">
 
-<br><br>
+      <div class="field">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" placeholder="Give your paste a title" required>
+      </div>
 
-Content <br>
-<textarea name="content"
-          rows="10"
-          cols="60"
-          required></textarea>
+      <div class="field">
+        <label for="content">Content</label>
+        <textarea id="content" name="content" placeholder="Paste your text or code here..." required
+                  oninput="updateCharCount()"></textarea>
+        <div class="field-footer">
+          <span class="char-count" id="charCount">0 characters</span>
+        </div>
+      </div>
 
-<br><br>
+      <div class="row-split">
+        <div class="field">
+          <label for="visibility">Visibility</label>
+          <select id="visibility" name="visibility">
+            <option value="PUBLIC">Public</option>
+            <option value="PRIVATE">Private</option>
+            <option value="UNLISTED">Unlisted</option>
+          </select>
+        </div>
 
-Visibility
+        <div class="field">
+          <label for="categoryId">Category</label>
+          <select id="categoryId" name="categoryId">
+            <option value="1">Programming</option>
+            <option value="2">Notes</option>
+            <option value="3">Personal</option>
+          </select>
+        </div>
+      </div>
 
-<select name="visibility">
+      <div class="form-actions">
+        <a class="btn btn-secondary" href="dashboard.jsp">Cancel</a>
+        <button type="submit" class="btn btn-primary">Create Paste</button>
+      </div>
 
-<option value="PUBLIC">Public</option>
+    </form>
+  </div>
+</div>
 
-<option value="PRIVATE">Private</option>
-
-<option value="UNLISTED">Unlisted</option>
-
-</select>
-
-<br><br>
-
-Category
-
-<select name="categoryId">
-
-<option value="1">Programming</option>
-<option value="2">Notes</option>
-<option value="3">Personal</option>
-
-</select>
-
-<br><br>
-
-<button type="submit">
-
-Create Paste
-
-</button>
-
-</form>
+<script>
+  function updateCharCount() {
+    var content = document.getElementById('content').value;
+    document.getElementById('charCount').textContent = content.length + ' characters';
+  }
+</script>
 
 </body>
 </html>
