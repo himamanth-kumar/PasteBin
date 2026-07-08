@@ -128,7 +128,7 @@ public class PasteDAO
                 if (rs.next()) {
 
                     Paste paste = new Paste();
-
+                    paste.setPublicId(rs.getString("public_id"));
                     paste.setPasteId(rs.getInt("paste_id"));
                     paste.setTitle(rs.getString("title"));
                     paste.setContent(rs.getString("content"));
