@@ -150,7 +150,7 @@
     }
     %>
 
-    <form action="register" method="post">
+    <form action="${pageContext.request.contextPath}/register" method="post"novalidate>
 
         <div class="form-group">
             <label>Username</label>

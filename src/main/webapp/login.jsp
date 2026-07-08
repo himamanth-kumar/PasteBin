@@ -20,8 +20,8 @@
             <c:out value="${requestScope.error}" />
         </div>
     </c:if>
-
-    <form action="login" method="post" novalidate>
+    
+    <form action="${pageContext.request.contextPath}/login" method="post" novalidate>
 
         <div class="field">
             <label for="email">Email</label>
