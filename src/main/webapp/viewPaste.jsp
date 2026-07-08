@@ -241,7 +241,7 @@ request.setAttribute("p", paste);
   </div>
 
   <div class="footer-actions">
-    <a class="btn btn-secondary" href="editPaste?id=${p.pasteId}">Edit</a>
+    <a class="btn btn-secondary" href="${pageContext.request.contextPath}/editPaste/${paste.publicId}">Edit</a>
     <a class="btn btn-primary"
    href="${pageContext.request.contextPath}/dashboard">
     Done

@@ -229,7 +229,7 @@ request.setAttribute("p", paste);
 
       <div class="form-actions">
         <a class="btn btn-secondary"
-   href="${pageContext.request.contextPath}/p/${p.publicId}">
+   href="${pageContext.request.contextPath}/p/${paste.publicId}">
     Cancel
 </a>
         <button type="submit" class="btn btn-primary">Update Paste</button>

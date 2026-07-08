@@ -66,12 +66,12 @@ public class RegisterServlet extends HttpServlet
             if (registered) {
 
                 // PRG Pattern
-                response.sendRedirect("login.jsp");
+            	response.sendRedirect(request.getContextPath() + "/login.jsp");
 
             } else {
 
                 request.setAttribute("error", "Registration failed.");
-                request.getRequestDispatcher("register.jsp")
+                request.getRequestDispatcher("/register.jsp")
                        .forward(request, response);
             }
 

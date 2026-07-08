@@ -43,7 +43,7 @@ public class LoginServlet extends HttpServlet {
 
             session.setAttribute("user", user);
 
-            response.sendRedirect("dashboard");
+            response.sendRedirect(request.getContextPath() + "/dashboard");
 
         } 
         else {
@@ -53,8 +53,7 @@ public class LoginServlet extends HttpServlet {
                     "Invalid email or password."
             );
 
-            request.getRequestDispatcher("login.jsp")
-                    .forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
 
         }
 
