@@ -45,6 +45,9 @@ public class DashboardServlet extends HttpServlet {
             List<Paste> pastes =pasteDAO.getUserPastes(user.getUserId());
 
             request.setAttribute("pastes", pastes);
+            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+            response.setHeader("Pragma", "no-cache");
+            response.setDateHeader("Expires", 0);
 
             request.getRequestDispatcher("dashboard.jsp").forward(request, response);
 

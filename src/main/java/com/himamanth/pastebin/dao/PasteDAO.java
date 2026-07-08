@@ -23,20 +23,20 @@ public class PasteDAO
 
         String sql = """
                 INSERT INTO pastes
-                (title, content, visibility, user_id, category_id)
-                VALUES (?, ?, ?, ?, ?)
+                (public_id, title, content, visibility, user_id, category_id)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
         try (
                 Connection con = DBConnection.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)
         ) {
-
-            ps.setString(1, paste.getTitle());
-            ps.setString(2, paste.getContent());
-            ps.setString(3, paste.getVisibility());
-            ps.setInt(4, paste.getUser().getUserId());
-            ps.setInt(5, paste.getCategory().getCategoryId());
+        	ps.setString(1, paste.getPublicId());
+            ps.setString(2, paste.getTitle());
+            ps.setString(3, paste.getContent());
+            ps.setString(4, paste.getVisibility());
+            ps.setInt(5, paste.getUser().getUserId());
+            ps.setInt(6, paste.getCategory().getCategoryId());
 
             int rowsAffected = ps.executeUpdate();
 
@@ -50,6 +50,58 @@ public class PasteDAO
             return false;
         }
     }
+    public Paste getPasteByPublicId(String publicId) throws Exception
+    {
+    	String sql = """
+                SELECT *
+                FROM pastes
+                WHERE public_id = ?
+                """;
+    	try (
+                Connection con = DBConnection.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, publicId);
+
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+
+                if (rs.next()) 
+                {
+
+                    Paste paste = new Paste();
+                    paste.setPublicId(rs.getString("public_id"));
+                    paste.setPasteId(rs.getInt("paste_id"));
+                    paste.setTitle(rs.getString("title"));
+                    paste.setContent(rs.getString("content"));
+                    paste.setVisibility(rs.getString("visibility"));
+                    paste.setCreatedAt(rs.getTimestamp("created_at"));
+                    paste.setUpdatedAt(rs.getTimestamp("updated_at"));
+
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    paste.setUser(user);
+
+                    Category category = new Category();
+                    category.setCategoryId(rs.getInt("category_id"));
+                    paste.setCategory(category);
+
+                    return paste;
+                }
+
+            }
+
+        } 
+        catch (SQLException e) 
+        {
+
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 
     /**
      * Returns one paste using paste id.
@@ -131,6 +183,7 @@ public class PasteDAO
 
                 Paste paste = new Paste();
 
+                paste.setPublicId(rs.getString("public_id"));
                 paste.setPasteId(rs.getInt("paste_id"));
                 paste.setTitle(rs.getString("title"));
                 paste.setContent(rs.getString("content"));
@@ -167,12 +220,13 @@ public class PasteDAO
 
         String sql = """
                 UPDATE pastes
-                SET title = ?,
-                    content = ?,
-                    visibility = ?,
-                    category_id = ?,
-                    updated_at = CURRENT_TIMESTAMP
-                WHERE paste_id = ?
+					SET title = ?,
+					 content = ?,
+					  visibility = ?,
+					  category_id = ?,
+					  updated_at = CURRENT_TIMESTAMP
+					WHERE paste_id = ?
+					AND user_id = ?
                 """;
 
         try (
@@ -180,11 +234,12 @@ public class PasteDAO
                 PreparedStatement ps = con.prepareStatement(sql)
         ) {
 
-            ps.setString(1, paste.getTitle());
-            ps.setString(2, paste.getContent());
-            ps.setString(3, paste.getVisibility());
-            ps.setInt(4, paste.getCategory().getCategoryId());
-            ps.setInt(5, paste.getPasteId());
+        	ps.setString(1, paste.getTitle());
+        	ps.setString(2, paste.getContent());
+        	ps.setString(3, paste.getVisibility());
+        	ps.setInt(4, paste.getCategory().getCategoryId());
+        	ps.setInt(5, paste.getPasteId());
+        	ps.setInt(6, paste.getUser().getUserId());
 
             int rowsAffected = ps.executeUpdate();
 
@@ -202,7 +257,7 @@ public class PasteDAO
     /**
      * Deletes a paste.
      */
-    public boolean deletePaste(int pasteId) throws Exception 
+    public boolean deletePaste(int pasteId, int userId) throws Exception 
     {
 
         String sql = """
@@ -217,7 +272,7 @@ public class PasteDAO
         ) {
 
             ps.setInt(1, pasteId);
-
+            ps.setInt(2, userId);
             int rowsAffected = ps.executeUpdate();
 
             return rowsAffected > 0;
@@ -253,7 +308,8 @@ public class PasteDAO
                 {
 
                     Paste paste = new Paste();
-
+                    
+                    paste.setPublicId(rs.getString("public_id"));
                     paste.setPasteId(rs.getInt("paste_id"));
                     paste.setTitle(rs.getString("title"));
                     paste.setContent(rs.getString("content"));

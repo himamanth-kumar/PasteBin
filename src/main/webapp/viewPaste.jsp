@@ -5,7 +5,7 @@
 <%
 Paste paste = (Paste) request.getAttribute("paste");
 if (paste == null) {
-    response.sendRedirect("dashboard.jsp");
+    response.sendRedirect(request.getContextPath() + "/dashboard");
     return;
 }
 request.setAttribute("p", paste);
@@ -199,7 +199,10 @@ request.setAttribute("p", paste);
 <body>
 
 <div class="topbar">
-  <a class="back" href="dashboard">&larr; Back to dashboard</a>
+ <a class="back"
+   href="${pageContext.request.contextPath}/dashboard">
+    &larr; Back to Dashboard
+</a>
 </div>
 
 <div class="container">
@@ -239,7 +242,10 @@ request.setAttribute("p", paste);
 
   <div class="footer-actions">
     <a class="btn btn-secondary" href="editPaste?id=${p.pasteId}">Edit</a>
-    <a class="btn btn-primary" href="dashboard">Done</a>
+    <a class="btn btn-primary"
+   href="${pageContext.request.contextPath}/dashboard">
+    Done
+</a>
   </div>
 </div>
 

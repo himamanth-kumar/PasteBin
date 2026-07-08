@@ -16,9 +16,20 @@ public class Paste {
     private Timestamp updatedAt;
     private User user;
     private Category category;
+    private String publicId;
 
     
-    public Paste() {
+    public String getPublicId() {
+		return publicId;
+	}
+
+
+	public void setPublicId(String publicId) {
+		this.publicId = publicId;
+	}
+
+
+	public Paste() {
 
     }
 
@@ -69,8 +80,8 @@ public class Paste {
 
     public void setVisibility(String visibility) {
 
-        if ("PUBLIC".equalsIgnoreCase(visibility)
-                || "PRIVATE".equalsIgnoreCase(visibility)) {
+        if ("PUBLIC".equalsIgnoreCase(visibility)|| "PRIVATE".equalsIgnoreCase(visibility)
+        		|| "UNLISTED".equalsIgnoreCase(visibility)) {
 
             this.visibility = visibility.toUpperCase();
         }

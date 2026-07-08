@@ -1,6 +1,7 @@
 package com.himamanth.pastebin.servlet;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import com.himamanth.pastebin.dao.PasteDAO;
 import com.himamanth.pastebin.model.Category;
@@ -28,6 +29,10 @@ public class CreatePasteServlet extends HttpServlet {
         String title = request.getParameter("title");
         String content = request.getParameter("content");
         String visibility = request.getParameter("visibility");
+        
+        String publicId ="PasteBin-Project-"+UUID.randomUUID().
+        		toString().replace("-", "");
+        
 
         int categoryId =Integer.parseInt(request.getParameter("categoryId"));
 
@@ -49,6 +54,7 @@ public class CreatePasteServlet extends HttpServlet {
 
         paste.setUser(user);
         paste.setCategory(category);
+        paste.setPublicId(publicId);
 
         try {
 
@@ -62,14 +68,9 @@ public class CreatePasteServlet extends HttpServlet {
             } 
             else {
 
-                request.setAttribute(
-                        "error",
-                        "Unable to create paste."
-                );
+                request.setAttribute( "error","Unable to create paste.");
 
-                request.getRequestDispatcher(
-                        "createPaste.jsp"
-                ).forward(request, response);
+                request.getRequestDispatcher("createPaste.jsp").forward(request, response);
 
             }
 

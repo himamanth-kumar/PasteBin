@@ -289,8 +289,9 @@ if (user == null) {
             </div>
 
             <div class="paste-card-actions">
-              <a href="paste?id=${paste.pasteId}">View</a>
-              <a href="editPaste?id=${paste.pasteId}">Edit</a>
+              <a href="${pageContext.request.contextPath}/p/${paste.publicId}">View</a>
+              <a href="${pageContext.request.contextPath}/editPaste/${paste.publicId}">Edit
+				</a>
 
               <form class="delete-form" action="deletePaste" method="post"
                     onsubmit="return confirm('Delete this paste? This cannot be undone.');">

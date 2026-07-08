@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/editPaste")
+@WebServlet("/editPaste/*")
 public class EditPasteServlet extends HttpServlet {
 
     private PasteDAO pasteDAO = new PasteDAO();
@@ -25,19 +25,36 @@ public class EditPasteServlet extends HttpServlet {
 
         try {
 
-            int pasteId = Integer.parseInt(request.getParameter("id"));
+        	String publicId = request.getPathInfo();
 
-            Paste paste = pasteDAO.getPasteById(pasteId);
+        	if (publicId == null || publicId.length() <= 1) {
+
+        	    response.sendRedirect(request.getContextPath() + "/dashboard");
+        	    return;
+        	}
+
+        	publicId = publicId.substring(1);
+
+        	Paste paste = pasteDAO.getPasteByPublicId(publicId);
 
             if (paste == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
 
-            HttpSession session =request.getSession(false);
+            HttpSession session = request.getSession(false);
 
-            User loggedUser =
-                    (User) session.getAttribute("user");
+            if (session == null) {
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
+                return;
+            }
+
+            User loggedUser = (User) session.getAttribute("user");
+
+            if (loggedUser == null) {
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
+                return;
+            }
 
             if (loggedUser == null || paste.getUser().getUserId()!= loggedUser.getUserId()) 
             {
@@ -48,7 +65,7 @@ public class EditPasteServlet extends HttpServlet {
 
             request.setAttribute("paste", paste);
 
-            request.getRequestDispatcher("editPaste.jsp").forward(request, response);
+            request.getRequestDispatcher("/editPaste.jsp").forward(request, response);
 
         } 
         catch (Exception e) 
@@ -75,6 +92,10 @@ public class EditPasteServlet extends HttpServlet {
             int categoryId =Integer.parseInt(request.getParameter("categoryId"));
 
             HttpSession session =request.getSession(false);
+            if (session == null) {
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
+                return;
+            }
 
             User user =(User) session.getAttribute("user");
 
@@ -95,7 +116,10 @@ public class EditPasteServlet extends HttpServlet {
             if (updated) 
             {
 
-                response.sendRedirect("paste?id=" + pasteId);
+            	Paste updatedPaste = pasteDAO.getPasteById(pasteId);
+
+            	response.sendRedirect(request.getContextPath()
+            	        + "/p/"+ updatedPaste.getPublicId());
 
             } else {
 
@@ -106,7 +130,7 @@ public class EditPasteServlet extends HttpServlet {
                         "paste",
                         paste);
 
-                request.getRequestDispatcher("editPaste.jsp")
+                request.getRequestDispatcher("/editPaste.jsp")
                         .forward(request, response);
 
             }

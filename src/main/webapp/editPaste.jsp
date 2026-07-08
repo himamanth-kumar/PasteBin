@@ -183,7 +183,10 @@ request.setAttribute("p", paste);
 <body>
 
 <div class="topbar">
-  <a class="back" href="dashboard">&larr; Back to dashboard</a>
+  <a class="back"
+   href="${pageContext.request.contextPath}/dashboard">
+    &larr; Back to Dashboard
+</a>
 </div>
 
 <div class="container">
@@ -225,7 +228,10 @@ request.setAttribute("p", paste);
       </div>
 
       <div class="form-actions">
-        <a class="btn btn-secondary" href="paste?id=${p.pasteId}">Cancel</a>
+        <a class="btn btn-secondary"
+   href="${pageContext.request.contextPath}/p/${p.publicId}">
+    Cancel
+</a>
         <button type="submit" class="btn btn-primary">Update Paste</button>
       </div>
 

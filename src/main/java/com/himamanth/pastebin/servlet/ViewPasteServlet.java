@@ -4,14 +4,16 @@ import java.io.IOException;
 
 import com.himamanth.pastebin.dao.PasteDAO;
 import com.himamanth.pastebin.model.Paste;
+import com.himamanth.pastebin.model.User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/paste")
+@WebServlet("/p/*")
 public class ViewPasteServlet extends HttpServlet 
 {
 
@@ -24,9 +26,19 @@ public class ViewPasteServlet extends HttpServlet
 
         try {
 
-            int pasteId =Integer.parseInt(request.getParameter("id"));
+        	String publicId = request.getPathInfo();
 
-            Paste paste =pasteDAO.getPasteById(pasteId);
+        	if (publicId == null || publicId.length() <= 1) 
+        	{
+        		response.sendRedirect("dashboard");
+        	    return;
+        	}
+
+        	publicId = publicId.substring(1);
+        	
+
+        	Paste paste = pasteDAO.getPasteByPublicId(publicId);
+        	
 
             if (paste == null) 
             {
@@ -35,16 +47,27 @@ public class ViewPasteServlet extends HttpServlet
 
                 return;
             }
+            HttpSession session = request.getSession(false);
 
-            request.setAttribute(
-                    "paste",
-                    paste
-            );
+            User loggedUser = null;
 
-            request.getRequestDispatcher
-            (
-                    "viewPaste.jsp"
-            ).forward(request, response);
+            if (session != null) 
+            {
+                loggedUser = (User) session.getAttribute("user");
+            }
+
+            if ("PRIVATE".equalsIgnoreCase(paste.getVisibility())) {
+
+                if (loggedUser == null ||loggedUser.getUserId() != paste.getUser().getUserId()) {
+
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                    return;
+                }
+            }
+
+            request.setAttribute("paste", paste);
+
+            request.getRequestDispatcher("/viewPaste.jsp").forward(request, response);
 
         } 
         catch (Exception e) {

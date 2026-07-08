@@ -58,7 +58,7 @@ public class DeletePasteServlet extends HttpServlet {
                 return;
             }
 
-            boolean deleted =pasteDAO.deletePaste(pasteId);
+            boolean deleted =pasteDAO.deletePaste(pasteId, user.getUserId());
 
             if (deleted)
             {
