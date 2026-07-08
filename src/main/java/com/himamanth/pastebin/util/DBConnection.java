@@ -3,32 +3,38 @@ package com.himamanth.pastebin.util;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Properties;
 
 public class DBConnection 
 {
 
-	public static Connection getConnection() throws Exception {
+    public static Connection getConnection() throws Exception {
 
-	    Class.forName("org.postgresql.Driver");
+        Class.forName("org.postgresql.Driver");
 
-	    Properties properties = new Properties();
+        String url = System.getenv("DB_URL");
+        String username = System.getenv("DB_USERNAME");
+        String password = System.getenv("DB_PASSWORD");
 
-	    InputStream input = DBConnection.class
-	            .getClassLoader()
-	            .getResourceAsStream("db.properties");
+        if (url == null || username == null || password == null) {
 
-	    if (input == null) {
-	        throw new RuntimeException("db.properties not found");
-	    }
+            Properties properties = new Properties();
 
-	    properties.load(input);
+            InputStream input = DBConnection.class
+                    .getClassLoader()
+                    .getResourceAsStream("db.properties");
 
-	    String url = properties.getProperty("db.url");
-	    String username = properties.getProperty("db.username");
-	    String password = properties.getProperty("db.password");
+            if (input == null) {
+                throw new RuntimeException("db.properties not found");
+            }
 
-	    return DriverManager.getConnection(url, username, password);
-	}
+            properties.load(input);
+
+            url = properties.getProperty("db.url");
+            username = properties.getProperty("db.username");
+            password = properties.getProperty("db.password");
+        }
+
+        return DriverManager.getConnection(url, username, password);
+    }
 }
